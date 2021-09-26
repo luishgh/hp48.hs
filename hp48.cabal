@@ -1,0 +1,30 @@
+cabal-version:       2.4
+
+name:                hp48
+version:             0.2.0.0
+synopsis:            A simple HP48 emulator
+-- description:
+-- bug-reports:
+license:             GPL-3.0-only
+license-file:        LICENSE
+author:              luishgh
+-- maintainer:
+copyright: (c) 2021 Luis Higino
+-- category:
+extra-source-files:  CHANGELOG.md
+
+executable hp48
+  -- required by Brick
+  ghc-options:         -threaded
+  main-is:             Main.hs
+  other-modules:       HP48.Controller
+                     , HP48.Stack
+                     , HP48.Tui
+  -- other-extensions:
+  build-depends:       base ^>=4.14.3.0
+                     , brick
+                     , microlens-platform
+                     , text-zipper
+                     , vty
+  -- hs-source-dirs:
+  default-language:    Haskell2010

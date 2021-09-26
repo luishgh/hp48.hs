@@ -34,24 +34,24 @@ import qualified HP48.Stack as S
 -- +-------+----------------+--------------+
 -- | ln    | Logarithm      | 1            |
 -- +-------+----------------+--------------+
-handleInput :: S.HP48Stack -> String -> S.HP48Stack
-handleInput stack input
+handleInput :: String -> S.HP48Stack -> S.HP48Stack
+handleInput input stack
   | inputReads /= [] =
     case inputReads of
       [(x, "")] -> S.push stack x
       _ -> stack
   where
     inputReads = reads input :: [(Double, String)]
-handleInput stack "+" = S.applyBinaryFunction (+) stack
-handleInput stack "-" = S.applyBinaryFunction (-) stack
-handleInput stack "*" = S.applyBinaryFunction (*) stack
-handleInput stack "x" = S.applyBinaryFunction (*) stack
-handleInput stack "/" = S.applyBinaryFunction (/) stack
-handleInput stack "**" = S.applyBinaryFunction (**) stack
-handleInput stack "^" = S.applyBinaryFunction (**) stack
-handleInput stack "ln" = S.applyUnaryFunction log stack
-handleInput stack "sum"
+handleInput "+" stack = S.applyBinaryFunction (+) stack
+handleInput "-" stack = S.applyBinaryFunction (-) stack
+handleInput "*" stack = S.applyBinaryFunction (*) stack
+handleInput "x" stack = S.applyBinaryFunction (*) stack
+handleInput "/" stack = S.applyBinaryFunction (/) stack
+handleInput "**" stack = S.applyBinaryFunction (**) stack
+handleInput "^" stack = S.applyBinaryFunction (**) stack
+handleInput "ln" stack = S.applyUnaryFunction log stack
+handleInput "sum" stack
   | S.isEmpty stack = stack
   | otherwise = S.singletonStack $ Just $ sum stack
-handleInput stack "pop" = snd $ S.pop stack
-handleInput stack _ = stack -- Default operation: does nothing
+handleInput "pop" stack = snd $ S.pop stack
+handleInput _ stack = stack -- Default operation: does nothing

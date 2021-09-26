@@ -7,19 +7,8 @@ License     : GPL-3
 
 module Main where
 
-import Control.Monad
-import HP48.Controller
-import HP48.IO
-import qualified HP48.Stack as S
+import HP48.Tui
+import HP48.Stack (emptyStack)
 
 main :: IO ()
-main = calculator S.emptyStack
-
--- | Prints menu, gets menu input and calculates new stack if input isn't @"e"@.
-calculator :: S.HP48Stack -> IO ()
-calculator stack = do
-  printMenu stack
-  input <- getMenuInput
-  when (input /= "e") $ do
-    let newStack = handleInput stack input
-    calculator newStack
+main = tui emptyStack -- start tui with an empty stack
