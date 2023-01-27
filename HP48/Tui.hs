@@ -7,6 +7,7 @@ License     : GPL-3
 
 {-# LANGUAGE TemplateHaskell #-}
 
+
 module HP48.Tui
   ( tui
   ) where
@@ -21,6 +22,7 @@ import Brick.Types
 import Brick.Widgets.Core
 import Brick.Widgets.Border
 import Brick.Widgets.Edit
+import qualified Graphics.Vty as V
 import Graphics.Vty.Input.Events
 
 import HP48.Stack (HP48Stack)
@@ -70,20 +72,15 @@ drawTui ts =
 
 -- | Handles events, returning the next state
 handleTuiEvent ::
-     TuiState -- | Current state
-  -> BrickEvent ResourceName e -- | Event that needs to be handled
-  -> EventM ResourceName (Next TuiState)
-handleTuiEvent ts (VtyEvent ev) =
-  case ev of
-    EvKey KEsc [] -> halt ts -- quit
-    EvKey (KChar 'q') [] -> halt ts -- quit
-    EvKey KEnter [] -- enter input
-     ->
-      let currentInput = head . getEditContents . view input $ ts -- current user input
-          updateStack = stack %~ handleInput currentInput -- extracts current stack and updates it
-          clearInput = input %~ applyEdit clearZipper -- clears user input
-       in continue $ ts & updateStack & clearInput
-    _ -> continue =<< handleEventLensed ts input handleEditorEvent ev -- update input content
+  BrickEvent ResourceName e -- | Event that needs to be handled
+  -> EventM ResourceName TuiState ()
+handleTuiEvent (VtyEvent (EvKey KEsc []))  = halt
+handleTuiEvent (VtyEvent (EvKey (KChar 'q') []))  = halt
+handleTuiEvent (VtyEvent (EvKey KEnter [])) = do
+  currentInput <- use input
+  stack %= handleInput (head $ getEditContents currentInput) -- parse current input and update stack accordingly
+  input %= applyEdit clearZipper -- clear user input
+handleTuiEvent e = zoom input $ handleEditorEvent e -- update input content
 
 -- | Definition of the tui elements
 tuiApp :: App TuiState e ResourceName
@@ -92,14 +89,15 @@ tuiApp =
     { appDraw = drawTui
     , appChooseCursor = showFirstCursor
     , appHandleEvent = handleTuiEvent
-    , appStartEvent = pure
-    , appAttrMap = const $ attrMap mempty []
+    , appStartEvent = return ()
+    , appAttrMap = const $ attrMap V.defAttr []
     }
 
 -- | The tui application
 tui ::
-    HP48Stack -- | Initial stack
-    -> IO ()
+  -- | Initial stack
+  HP48Stack ->
+  IO ()
 tui stack = do
   let initialState = TuiState stack "{ HOME }" (editor "Input" Nothing "")
   defaultMain tuiApp initialState
