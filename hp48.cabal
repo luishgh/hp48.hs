@@ -21,7 +21,7 @@ executable hp48
                      , HP48.Stack
                      , HP48.Tui
   -- other-extensions:
-  build-depends:       base ^>=4.14.3.0
+  build-depends:       base >=4.14.3.0 && < 5
                      , brick
                      , microlens-platform
                      , text-zipper
